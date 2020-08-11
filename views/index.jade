@@ -1,0 +1,55 @@
+extends layout
+
+block content
+  h1= title
+
+  div(data-role='fieldcontain')
+    label(for='startDate') startDate
+      input(id='startDate',type='text',value='',name='startDate')
+  div(data-role='fieldcontain')
+    label(for='endDate') endDate
+      input(id='endDate',type='text',value='',name='endDate')
+  div(data-role='fieldcontain')
+    label(for='minCount') minCount
+      input(id='minCount',type='text',value='',name='minCount')
+  div(data-role='fieldcontain')
+    label(for='maxCount') maxCount
+      input(id='maxCount',type='text',value='',name='maxCount')
+  div(data-role='fieldcontain')   
+    button(onclick='fetchData()')
+      | Fetch
+
+  p(id='response')
+
+    script.
+      function fetchData() {
+        const data = {
+          startDate: document.getElementById('startDate').value,
+          endDate: document.getElementById('endDate').value,
+          minCount: document.getElementById('minCount').value,
+          maxCount: document.getElementById('maxCount').value,
+        };
+
+        fetch(`${window.location.href}fetch-data`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        })
+        .then(response => response.text())
+        .then(data => {
+          appendData(data);
+        })
+        .catch((error) => {
+          appendData(error);
+        });
+      }
+
+      function appendData(data) {
+        const response = document.getElementById('response');
+        response.innerText = data;
+      }
+
+
+
