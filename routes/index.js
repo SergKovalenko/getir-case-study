@@ -28,17 +28,16 @@ router.post('/fetch-data', (req, res, next) => {
     const fetchRequest = req.body;
     const db = dbModule.getDB();
 
-    // minCount and maxCount to number 
-    fetchRequest.minCount = +(fetchRequest.minCount);
-    fetchRequest.maxCount = +(fetchRequest.maxCount);
+    // minCount and maxCount to number
+    fetchRequest.minCount = parseInt(fetchRequest.minCount);
+    fetchRequest.maxCount = parseInt(fetchRequest.maxCount);
 
-    const isJsonRequesValid = v.validate(fetchRequest, schema).valid
-
-    if (!isJsonRequesValid) {
-        return res.send({
-            code: 400,
-            msg: "Invalid data in request JSON",
-            records,
+    const isJsonRequestValid = v.validate(fetchRequest, schema).valid
+    if (!isJsonRequestValid) {
+        return res.status(400).send({
+            code: 4,
+            msg: "Invalid data type or data structure in request JSON",
+            records: [],
         });
     }
 
@@ -81,8 +80,18 @@ router.post('/fetch-data', (req, res, next) => {
                 msg: "Success",
                 records,
             });
+
+            aggCursor.close();
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            console.log(err);
+
+            res.status(500).send({
+                code: 5,
+                msg: "Oops.. something went wrong on data retrieval",
+                records: [],
+            });
+        });
 });
 
 module.exports = router;
